@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#f4f3ef">
+  <meta name="description" content="A private, local-first color contrast checker for accessible interfaces. Test WCAG text contrast, compare palettes, and export CSS tokens.">
+  <title>ContrastKit — accessible color, clearly checked</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='17' fill='%2328a178'/%3E%3Ccircle cx='32' cy='32' r='19' fill='none' stroke='white' stroke-width='6'/%3E%3Cpath d='M32 13a19 19 0 0 1 0 38z' fill='white'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css"><script defer src="app.js"></script>
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="#"><span class="brand-icon">◐</span><span>contrast<span class="brand-strong">kit</span></span></a><div class="top-note"><span></span> A practical tool for readable interfaces</div><div class="top-right"><span class="local-badge">⌂ &nbsp; Private · Runs locally</span><button id="theme" class="theme-button" aria-label="Switch color theme" title="Switch theme">◐</button></div></header>
+  <main class="page">
+    <section class="hero"><div class="eyebrow"><i></i> ACCESSIBILITY TOOLKIT</div><h1>Good color should<br><em>read well, too.</em></h1><p>Check text contrast, compare a palette, and export ready-to-use CSS tokens. Everything stays in this tab.</p><div class="hero-tags"><span>WCAG 2.2</span><b>·</b><span>AA & AAA</span><b>·</b><span>No uploads</span></div></section>
+    <section class="app-card">
+      <div class="app-head"><div class="app-title"><span class="live-dot"></span><div><strong>Contrast checker</strong><small>Adjust the colors to see the result</small></div></div><div class="head-tools"><button id="swap" class="subtle-button" title="Swap foreground and background">⇄ &nbsp; Swap</button><button id="reset" class="subtle-button">Reset</button></div></div>
+      <div class="checker-grid">
+        <div class="controls">
+          <div class="color-control"><label for="fg">Text color <span>FOREGROUND</span></label><div class="color-entry"><input id="fg-picker" aria-label="Choose text color" type="color" value="#24352d"><input id="fg" class="hex-input" aria-label="Text color hex value" value="#24352d" maxlength="7" spellcheck="false"><button class="copy-color" data-copy="fg" title="Copy text color">⧉</button></div><div class="color-hint">The text and foreground elements</div></div>
+          <div class="color-control"><label for="bg">Background color <span>BACKGROUND</span></label><div class="color-entry"><input id="bg-picker" aria-label="Choose background color" type="color" value="#ffffff"><input id="bg" class="hex-input" aria-label="Background color hex value" value="#ffffff" maxlength="7" spellcheck="false"><button class="copy-color" data-copy="bg" title="Copy background color">⧉</button></div><div class="color-hint">The surface behind the text</div></div>
+          <div class="swap-divider"><span></span><button id="swap-small" aria-label="Swap text and background colors">⇅</button><span></span></div>
+          <div class="font-size-control"><label for="font-size">Text size</label><div class="segmented"><button class="size-option" data-size="normal" aria-pressed="true">Normal text</button><button class="size-option" data-size="large" aria-pressed="false">Large text</button></div><small>Large text: at least 24px or 18.66px bold</small></div>
+          <div class="result-box"><div class="result-label">CONTRAST RATIO <span id="ratio">—</span></div><div id="criteria" class="criteria"></div><div class="result-foot"><span>Normal text needs <b>4.5:1</b> for AA</span><span>Large text needs <b>3:1</b></span></div></div>
+        </div>
+        <div class="preview-column"><div class="preview-label">LIVE PREVIEW <span>Foreground on background</span></div><div id="preview" class="preview" aria-label="Color contrast preview"><div class="preview-sample"><div class="sample-kicker">A clearer interface</div><h2>Readable by<br>everyone.</h2><p>Thoughtful color makes every screen more comfortable to use.</p><button class="sample-button">Take a closer look <span>→</span></button></div><div class="preview-size"><span>Previewing</span><b id="preview-size-label">16px body · 32px heading</b></div></div><div class="score-note"><span class="score-mark">✦</span><p id="score-note">Change either color to see how the pair performs.</p></div></div>
+      </div>
+    </section>
+    <section class="palette-card"><div class="section-heading"><div><div class="eyebrow"><i></i> QUICK PALETTE CHECK</div><h2>Try a whole color set.</h2><p>Each swatch is checked against the current background.</p></div><button id="export-css" class="export-button">Export CSS <span>↓</span></button></div><div id="palette" class="palette-grid"></div><div class="palette-actions"><button id="add-color" class="add-button">＋ &nbsp; Add color</button><span>Each color gets its own AA / AAA result.</span></div><pre id="css-output" class="css-output" hidden></pre></section>
+    <section class="guide-card"><div><span class="guide-number">01</span><h3>What does the ratio mean?</h3><p>Contrast is measured from 1:1 (no difference) to 21:1 (maximum). The higher the ratio, the easier text is to distinguish from its background.</p></div><div><span class="guide-number">02</span><h3>What are AA and AAA?</h3><p>WCAG levels describe minimum contrast. AA is the common target: 4.5:1 for normal text and 3:1 for large text. AAA is stricter: 7:1 and 4.5:1.</p></div><div><span class="guide-number">03</span><h3>What does this check?</h3><p>ContrastKit follows the WCAG relative-luminance formula for opaque sRGB colors. It is a useful check, not a substitute for reviewing an entire interface.</p></div></section>
+    <footer class="footer"><span>ContrastKit <b>v1.0.0</b></span><span>Local-first · Open source · MIT</span><span>Color choices, checked with care.</span></footer>
+  </main><div id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
