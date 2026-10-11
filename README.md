@@ -33,7 +33,7 @@ Open [ContrastKit](https://ghostnever-lkm.github.io/contrastkit/) and choose col
 
 ### Download
 
-Download `ContrastKit-v1.0.0.zip` from the [latest release](https://github.com/GhosTnever-lkm/contrastkit/releases/latest), extract it, and open `index.html` in a modern browser.
+Download `ContrastKit-v1.0.1.zip` from the [latest release](https://github.com/GhosTnever-lkm/contrastkit/releases/latest), extract it, and open `index.html` in a modern browser.
 
 ### Host your own copy
 
@@ -61,9 +61,18 @@ ContrastKit does not upload color values, use external fonts, or contact an appl
 
 ## Project details
 
-- Version: **1.0.0**
+- Version: **1.0.1**
 - License: [MIT](LICENSE)
 - Author: [GhosTnever-lkm](https://github.com/GhosTnever-lkm)
+
+## Development checks
+
+Node.js 20 or newer is required to run the tests:
+
+```sh
+npm test
+npm run check
+```
 
 ## Support / Pro Version
 

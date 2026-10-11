@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.1 — 2026-10-11
+
+- Extract WCAG color normalization and contrast math into a testable module.
+- Add reference-ratio tests and a CI workflow; load the app as an ES module.
+- Refresh the version and download instructions.
+
 ## 1.0.0 — 2026-10-08
 
 - First public release of ContrastKit.
