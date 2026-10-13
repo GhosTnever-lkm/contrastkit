@@ -1,4 +1,4 @@
-import { normalizeHex, ratio } from './contrast.mjs';
+import { normalizeHex, ratio, thresholds } from './contrast.mjs';
 
 (() => {
   'use strict';
@@ -27,7 +27,7 @@ import { normalizeHex, ratio } from './contrast.mjs';
     const text = normalizeHex(fg.value), surface = normalizeHex(bg.value);
     if (!text || !surface) {
       $('#ratio').textContent = '—'; $('#criteria').innerHTML = '<span class="badge info">Enter a valid 3 or 6 digit hex color</span>';
-      $('#score-note').textContent = 'Use a hex value such as #263238.'; return;
+      $('#score-note').textContent = 'Use a hex value such as #263238.'; renderPalette(); return;
     }
     fg.value = text.toLowerCase(); bg.value = surface.toLowerCase(); fgPicker.value = text.toLowerCase(); bgPicker.value = surface.toLowerCase();
     const score = ratio(text, surface), large = textSize === 'large';
@@ -42,6 +42,8 @@ import { normalizeHex, ratio } from './contrast.mjs';
   }
   function renderPalette() {
     const container = $('#palette'); container.replaceChildren();
+    const background = normalizeHex(bg.value);
+    const limits = thresholds(textSize);
     colors.forEach((color, index) => {
       const card = document.createElement('article'); card.className = 'swatch';
       const top = document.createElement('div'); top.className = 'swatch-color'; top.style.background = color;
@@ -50,8 +52,9 @@ import { normalizeHex, ratio } from './contrast.mjs';
       const info = document.createElement('div'); info.className = 'swatch-info';
       const name = document.createElement('div'); name.className = 'swatch-name'; name.innerHTML = `<span>Color ${index + 1}</span><button class="copy-color palette-copy" data-color="${color}" aria-label="Copy color ${index + 1}">⧉</button>`;
       const hex = document.createElement('div'); hex.className = 'swatch-hex'; hex.textContent = color;
-      const badges = document.createElement('div'); badges.className = 'swatch-results'; const score = ratio(color, bg.value);
-      badges.innerHTML = `<span class="mini-badge ${score >= 4.5 ? 'pass' : 'fail'}">AA ${score >= 4.5 ? '✓' : '×'}</span><span class="mini-badge ${score >= 7 ? 'pass' : 'fail'}">AAA ${score >= 7 ? '✓' : '×'}</span>`;
+      const badges = document.createElement('div'); badges.className = 'swatch-results'; const score = background ? ratio(color, background) : NaN;
+      if (!Number.isFinite(score)) badges.innerHTML = '<span class="mini-badge info">AA —</span><span class="mini-badge info">AAA —</span>';
+      else badges.innerHTML = `<span class="mini-badge ${score >= limits.aa ? 'pass' : 'fail'}">AA ${score >= limits.aa ? '✓' : '×'}</span><span class="mini-badge ${score >= limits.aaa ? 'pass' : 'fail'}">AAA ${score >= limits.aaa ? '✓' : '×'}</span>`;
       info.append(name, hex, badges); card.append(top, info); container.append(card);
     });
     $$('.palette-copy').forEach(button => button.addEventListener('click', () => copyText(button.dataset.color)));
@@ -68,8 +71,8 @@ import { normalizeHex, ratio } from './contrast.mjs';
     const picker = index === 0 ? fgPicker : bgPicker;
     field.addEventListener('input', () => {
       const value = normalizeHex(field.value);
-      field.removeAttribute('aria-invalid');
-      if (value && field.value.replace(/^#/, '').length >= 3) render();
+      if (value) { field.removeAttribute('aria-invalid'); render(); }
+      else { field.setAttribute('aria-invalid', 'true'); render(); }
     });
     field.addEventListener('blur', () => { if (!setInputColor(field, picker, field)) field.setAttribute('aria-invalid', 'true'); render(); });
     field.addEventListener('keydown', event => { if (event.key === 'Enter') { field.blur(); } });

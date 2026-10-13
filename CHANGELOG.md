@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.2 — 2026-10-13
+
+- Apply normal or large text thresholds to every palette swatch.
+- Show neutral palette results when the background color is invalid.
+- Add a regression test for normal and large text thresholds.
+
 ## 1.0.1 — 2026-10-11
 
 - Extract WCAG color normalization and contrast math into a testable module.
