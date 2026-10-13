@@ -21,7 +21,7 @@ Choose or enter a text color and background color. ContrastKit calculates the WC
 - WCAG 2.2 relative-luminance contrast ratio for opaque sRGB colors.
 - AA and AAA outcomes for normal and large text.
 - Live preview with foreground/background color controls.
-- Editable palette with per-color contrast outcomes.
+- Editable palette with AA/AAA results that follow the selected text size.
 - CSS custom property export for the checked pair and palette.
 - Light and dark themes, responsive layout, no account and no build step.
 
@@ -33,7 +33,7 @@ Open [ContrastKit](https://ghostnever-lkm.github.io/contrastkit/) and choose col
 
 ### Download
 
-Download `ContrastKit-v1.0.1.zip` from the [latest release](https://github.com/GhosTnever-lkm/contrastkit/releases/latest), extract it, and open `index.html` in a modern browser.
+Download `ContrastKit-v1.0.2.zip` from the [latest release](https://github.com/GhosTnever-lkm/contrastkit/releases/latest), extract it, and serve the folder over HTTP. Because the app uses browser modules, opening `index.html` directly as a `file://` URL may be blocked by the browser. With Python installed, run `python -m http.server 8000` in the extracted folder and open `http://localhost:8000`.
 
 ### Host your own copy
 
@@ -58,10 +58,11 @@ ContrastKit does not upload color values, use external fonts, or contact an appl
 - Alpha transparency, gradients, images, and blend modes are not evaluated.
 - Contrast is one accessibility check; it does not assess focus, color meaning, typography, or the rest of a complete interface.
 - Results are a practical design aid, not formal certification of a page.
+- When a color is invalid, its previous contrast result is cleared.
 
 ## Project details
 
-- Version: **1.0.1**
+- Version: **1.0.2**
 - License: [MIT](LICENSE)
 - Author: [GhosTnever-lkm](https://github.com/GhosTnever-lkm)
 
@@ -73,6 +74,8 @@ Node.js 20 or newer is required to run the tests:
 npm test
 npm run check
 ```
+
+Create a release archive and SHA-256 checksum by pushing a `v*` tag. GitHub Actions attaches both files to the matching release.
 
 ## Support / Pro Version
 

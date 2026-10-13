@@ -25,3 +25,7 @@ export function ratio(a, b) {
   if (!Number.isFinite(l1) || !Number.isFinite(l2)) return NaN;
   return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
 }
+
+export function thresholds(size) {
+  return size === 'large' ? { aa: 3, aaa: 4.5 } : { aa: 4.5, aaa: 7 };
+}

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { luminance, normalizeHex, ratio } from './contrast.mjs';
+import { luminance, normalizeHex, ratio, thresholds } from './contrast.mjs';
 
 test('normalizes short and long hex colors and rejects unsupported input', () => {
   assert.equal(normalizeHex('#abc'), '#AABBCC');
@@ -19,4 +19,11 @@ test('matches WCAG reference contrast ratios', () => {
 test('invalid colors do not produce a numeric contrast result', () => {
   assert.ok(Number.isNaN(luminance('not-a-color')));
   assert.ok(Number.isNaN(ratio('#ffffff', 'transparent')));
+});
+
+test('palette thresholds follow the selected text size', () => {
+  assert.deepEqual(thresholds('normal'), { aa: 4.5, aaa: 7 });
+  assert.deepEqual(thresholds('large'), { aa: 3, aaa: 4.5 });
+  assert.ok(ratio('#777777', '#ffffff') >= thresholds('large').aa);
+  assert.ok(ratio('#777777', '#ffffff') < thresholds('normal').aa);
 });

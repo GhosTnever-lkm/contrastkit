@@ -1,0 +1,27 @@
+name: Package ContrastKit release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Create archive and checksum
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          mkdir -p dist
+          zip -r "dist/ContrastKit-${RELEASE_TAG}.zip" . -x './.git/*' './dist/*' './ContrastKit-*.zip'
+          sha256sum "dist/ContrastKit-${RELEASE_TAG}.zip" > "dist/ContrastKit-${RELEASE_TAG}.zip.sha256"
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: gh release create "$RELEASE_TAG" dist/* --title "ContrastKit $RELEASE_TAG" --notes-file CHANGELOG.md
