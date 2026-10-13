@@ -2,6 +2,7 @@
   'use strict';
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+  const { normalizeHex, ratio, thresholds, evaluate } = globalThis.ContrastKitCore;
   const fg = $('#fg'), bg = $('#bg'), fgPicker = $('#fg-picker'), bgPicker = $('#bg-picker');
   let textSize = 'normal';
   let colors = ['#24352D', '#4D8067', '#87A98F', '#D5E7D9', '#F0C879'];
@@ -10,27 +11,6 @@
   function showToast(message) {
     const toast = $('#toast'); toast.textContent = message; toast.classList.add('show');
     clearTimeout(toastTimer); toastTimer = setTimeout(() => toast.classList.remove('show'), 1700);
-  }
-  function normalizeHex(value) {
-    const clean = value.trim().replace(/^#/, '');
-    if (/^[0-9a-f]{3}$/i.test(clean)) return '#' + clean.split('').map(char => char + char).join('').toUpperCase();
-    if (/^[0-9a-f]{6}$/i.test(clean)) return '#' + clean.toUpperCase();
-    return null;
-  }
-  function channelToLinear(byte) {
-    const c = byte / 255;
-    return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
-  }
-  function luminance(hex) {
-    const color = normalizeHex(hex);
-    if (!color) return NaN;
-    const r = parseInt(color.slice(1, 3), 16), g = parseInt(color.slice(3, 5), 16), b = parseInt(color.slice(5, 7), 16);
-    return 0.2126 * channelToLinear(r) + 0.7152 * channelToLinear(g) + 0.0722 * channelToLinear(b);
-  }
-  function ratio(a, b) {
-    const l1 = luminance(a), l2 = luminance(b);
-    if (!Number.isFinite(l1) || !Number.isFinite(l2)) return NaN;
-    return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
   }
   function badge(label, pass) {
     return `<span class="badge ${pass ? 'pass' : 'fail'}">${label} ${pass ? 'Pass' : 'Fail'}</span>`;
@@ -43,24 +23,29 @@
     return true;
   }
   function render() {
-    const text = normalizeHex(fg.value), surface = normalizeHex(bg.value);
-    if (!text || !surface) {
-      $('#ratio').textContent = '—'; $('#criteria').innerHTML = '<span class="badge info">Enter a valid 3 or 6 digit hex color</span>';
-      $('#score-note').textContent = 'Use a hex value such as #263238.'; return;
+    const result = evaluate(fg.value, bg.value, textSize);
+    if (!result.valid) {
+      $('#ratio').textContent = '—';
+      $('#criteria').innerHTML = '<span class="badge info">Enter a valid 3 or 6 digit hex color</span>';
+      $('#score-note').textContent = 'The contrast result is hidden until both colors are valid.';
+      renderPalette();
+      return;
     }
+    const { foreground: text, background: surface, ratio: score } = result;
     fg.value = text.toLowerCase(); bg.value = surface.toLowerCase(); fgPicker.value = text.toLowerCase(); bgPicker.value = surface.toLowerCase();
-    const score = ratio(text, surface), large = textSize === 'large';
-    const aaLimit = large ? 3 : 4.5, aaaLimit = large ? 4.5 : 7;
+    const large = textSize === 'large';
     $('#ratio').textContent = `${score.toFixed(2)}:1`;
-    $('#criteria').innerHTML = badge('AA', score >= aaLimit) + badge('AAA', score >= aaaLimit);
+    $('#criteria').innerHTML = badge('AA', result.aa) + badge('AAA', result.aaa);
     const preview = $('#preview'); preview.style.backgroundColor = surface; preview.style.color = text;
     preview.classList.toggle('large-preview', large); $('#preview-size-label').textContent = large ? '24px body · 40px heading' : '16px body · 32px heading';
-    const note = score >= aaaLimit ? 'Excellent contrast. This pair meets AAA for the selected text size.' : score >= aaLimit ? 'This pair meets AA for the selected text size. Try a little more contrast for AAA.' : score >= 3 && !large ? 'This pair passes AA for large text only. Increase contrast for regular text.' : 'This pair does not meet AA for the selected text size. Darken the text or lighten the background.';
+    const note = result.aaa ? 'Excellent contrast. This pair meets AAA for the selected text size.' : result.aa ? 'This pair meets AA for the selected text size. Try a little more contrast for AAA.' : score >= 3 && !large ? 'This pair passes AA for large text only. Increase contrast for regular text.' : 'This pair does not meet AA for the selected text size. Darken the text or lighten the background.';
     $('#score-note').textContent = note;
     renderPalette();
   }
   function renderPalette() {
     const container = $('#palette'); container.replaceChildren();
+    const background = normalizeHex(bg.value);
+    const limits = thresholds(textSize);
     colors.forEach((color, index) => {
       const card = document.createElement('article'); card.className = 'swatch';
       const top = document.createElement('div'); top.className = 'swatch-color'; top.style.background = color;
@@ -69,8 +54,9 @@
       const info = document.createElement('div'); info.className = 'swatch-info';
       const name = document.createElement('div'); name.className = 'swatch-name'; name.innerHTML = `<span>Color ${index + 1}</span><button class="copy-color palette-copy" data-color="${color}" aria-label="Copy color ${index + 1}">⧉</button>`;
       const hex = document.createElement('div'); hex.className = 'swatch-hex'; hex.textContent = color;
-      const badges = document.createElement('div'); badges.className = 'swatch-results'; const score = ratio(color, bg.value);
-      badges.innerHTML = `<span class="mini-badge ${score >= 4.5 ? 'pass' : 'fail'}">AA ${score >= 4.5 ? '✓' : '×'}</span><span class="mini-badge ${score >= 7 ? 'pass' : 'fail'}">AAA ${score >= 7 ? '✓' : '×'}</span>`;
+      const badges = document.createElement('div'); badges.className = 'swatch-results'; const score = background ? ratio(color, background) : NaN;
+      if (!Number.isFinite(score)) badges.innerHTML = '<span class="mini-badge info">AA —</span><span class="mini-badge info">AAA —</span>';
+      else badges.innerHTML = `<span class="mini-badge ${score >= limits.aa ? 'pass' : 'fail'}">AA ${score >= limits.aa ? '✓' : '×'}</span><span class="mini-badge ${score >= limits.aaa ? 'pass' : 'fail'}">AAA ${score >= limits.aaa ? '✓' : '×'}</span>`;
       info.append(name, hex, badges); card.append(top, info); container.append(card);
     });
     $$('.palette-copy').forEach(button => button.addEventListener('click', () => copyText(button.dataset.color)));
@@ -87,8 +73,8 @@
     const picker = index === 0 ? fgPicker : bgPicker;
     field.addEventListener('input', () => {
       const value = normalizeHex(field.value);
-      field.removeAttribute('aria-invalid');
-      if (value && field.value.replace(/^#/, '').length >= 3) render();
+      if (value) { field.removeAttribute('aria-invalid'); render(); }
+      else { field.setAttribute('aria-invalid', 'true'); render(); }
     });
     field.addEventListener('blur', () => { if (!setInputColor(field, picker, field)) field.setAttribute('aria-invalid', 'true'); render(); });
     field.addEventListener('keydown', event => { if (event.key === 'Enter') { field.blur(); } });
