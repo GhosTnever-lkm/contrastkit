@@ -33,7 +33,7 @@ Open [ContrastKit](https://ghostnever-lkm.github.io/contrastkit/) and choose col
 
 ### Download
 
-Download `ContrastKit-v1.0.2.zip` from the [latest release](https://github.com/GhosTnever-lkm/contrastkit/releases/latest), extract it, and serve the folder over HTTP. Because the app uses browser modules, opening `index.html` directly as a `file://` URL may be blocked by the browser. With Python installed, run `python -m http.server 8000` in the extracted folder and open `http://localhost:8000`.
+Download `ContrastKit-v1.0.3.zip` from the [latest release](https://github.com/GhosTnever-lkm/contrastkit/releases/latest), extract it, and serve the folder over HTTP. Because the app uses browser modules, opening `index.html` directly as a `file://` URL may be blocked by the browser. With Python installed, run `python -m http.server 8000` in the extracted folder and open `http://localhost:8000`.
 
 ### Host your own copy
 
@@ -62,7 +62,7 @@ ContrastKit does not upload color values, use external fonts, or contact an appl
 
 ## Project details
 
-- Version: **1.0.2**
+- Version: **1.0.3**
 - License: [MIT](LICENSE)
 - Author: [GhosTnever-lkm](https://github.com/GhosTnever-lkm)
 
