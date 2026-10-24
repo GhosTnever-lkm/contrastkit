@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.3 — 2026-10-24
+
+- Add visible keyboard focus indicators to controls, including HEX fields and palette color pickers.
+
 ## 1.0.2 — 2026-10-13
 
 - Apply normal or large text thresholds to every palette swatch.
